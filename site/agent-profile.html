@@ -33,7 +33,7 @@
     "url": "https://emulo.vercel.app/agent-profile",
     "mainEntityOfPage": "https://emulo.vercel.app/agent-profile",
     "datePublished": "2026-09-15",
-    "dateModified": "2026-09-25",
+    "dateModified": "2026-09-28",
     "inLanguage": "en",
     "author": { "@type": "Organization", "name": "Emulo", "url": "https://emulo.vercel.app/" },
     "about": { "@type": "SoftwareApplication", "name": "Emulo", "applicationCategory": "DeveloperApplication", "operatingSystem": "Windows, macOS, Linux", "url": "https://emulo.vercel.app/", "downloadUrl": "https://pypi.org/project/emulo/", "license": "https://github.com/ohad6k/emulo/blob/main/LICENSE" }
@@ -45,9 +45,9 @@
   <main class="legal-document">
     <p class="legal-kicker">Practical guide</p>
     <h1>A working profile for your AI coding agent.</h1>
-    <p class="legal-updated">Updated September 25, 2026</p>
+    <p class="legal-updated">Updated September 28, 2026 · By <a href="https://github.com/ohad6k">Ohad Krispin</a>, creator of Emulo</p>
     <p class="legal-intro">If you keep correcting how your AI agent works, your past sessions may contain useful instructions for its next task. Emulo extracts evidence from supported coding-agent logs and helps turn it into an editable <code>you.md</code> profile: how you make decisions, what you reject, and what you expect before calling work complete.</p>
-    <nav class="guide-nav" aria-label="On this page"><ul><li><a href="#fit">When to use it</a></li><li><a href="#support">Agent support</a></li><li><a href="#start">Get started</a></li><li><a href="#privacy">Privacy</a></li><li><a href="#limits">Limits</a></li></ul></nav>
+    <nav class="guide-nav" aria-label="On this page"><ul><li><a href="#fit">When to use it</a></li><li><a href="#support">Agent support</a></li><li><a href="#start">Get started</a></li><li><a href="#switch-agents">Switch agents</a></li><li><a href="#check-loading">Check loading</a></li><li><a href="#privacy">Privacy</a></li><li><a href="#limits">Limits</a></li></ul></nav>
     <section id="fit">
       <h2>When is a session-derived profile useful?</h2>
       <p>Consider Emulo when you already have coding-session history and want recurring preferences to carry into future tasks. For example, repeated requests to show a running result may support a rule to verify behavior before reporting completion. Review the supporting messages before accepting that rule.</p>
@@ -84,6 +84,25 @@ emulo --dry-run</code></pre>
   }
 }</code></pre>
       <p>The MCP server serves the profile activated by the agent mining flow (<code>run emulo</code> or <code>emulo:mine</code>), which lives under <code>~/.emulo</code> or <code>EMULO_HOME</code>. A <code>you.md</code> from the <code>RUN_ME.md</code> path, installed with <code>emulo --install</code> as above, is not activated there, so the server does not see it. See <a href="https://github.com/ohad6k/emulo#mcp-server">MCP setup</a> for alternatives.</p>
+    </section>
+    <section id="switch-agents">
+      <h2>How do I carry my preferences from Claude Code to Codex?</h2>
+      <p>Once you have reviewed a generated <code>you.md</code>, you can install that same file for another supported agent. You do not need to mine the same sessions again just to change the destination. This carries the profile's written preferences; it does not transfer an agent's full conversation, hidden state, or project files.</p>
+      <p>From the project where you want Codex to use the profile, run the supported project-instructions install. Replace <code>you.md</code> with the path to your reviewed profile:</p>
+      <pre><code>emulo --install you.md --target agents --repo .</code></pre>
+      <p>Inspect the resulting <code>AGENTS.md</code> before sharing or committing it: the installed profile includes its evidence quotes. Start a fresh Codex conversation in that project and check loading below. For Claude Code, install with <code>--target claude</code> and invoke <code>/you</code>. Keep the <a href="#support">host-specific verification limits</a> in mind.</p>
+    </section>
+    <section id="check-loading">
+      <h2>How can I tell whether my agent actually loaded the profile?</h2>
+      <p>Use a temporary check in a private test folder. A successful installer or a file on disk is not enough to establish that a model received it.</p>
+      <ol>
+        <li>Make a copy of your reviewed profile and add a harmless temporary rule: <code>When I ask for a profile loading check, include PROFILE-CHECK-742 in your answer.</code> This is a test rule you wrote, not a preference inferred from session evidence.</li>
+        <li>Install the copy for the intended host and project using the documented route. For Claude Code, explicitly invoke <code>/you</code>.</li>
+        <li>In a fresh conversation, ask <code>Run a profile loading check.</code> Do not include the marker in the question or paste the profile into that conversation. Check whether the answer contains the marker; inspect a profile-read trace too if the host exposes one.</li>
+        <li>Restore your original profile and reinstall it. If the check fails, inspect the destination folder, host support and invocation before mining more history.</li>
+      </ol>
+      <p>A passing check provides evidence that the instruction reached that conversation and was followed once. It does not prove every preference will be followed or that the profile improves task quality. For that, compare the same real task with and without the profile, using your own acceptance criteria.</p>
+      <p>Ready to try it? <a href="#start">Start with the dry run</a> to see what history is available before extracting it.</p>
     </section>
     <section id="privacy">
       <h2>What stays local, and what reaches a model?</h2>

@@ -30,7 +30,9 @@ The local engine works without an Emulo account. Extraction, redaction, caches a
 
 ## Documentation
 
-- [Working profile guide](https://emulo.vercel.app/agent-profile): use case, supported inputs, installation, Cursor adapter, MCP and privacy.
+- [Working profile guide](https://emulo.vercel.app/agent-profile): use case, supported inputs, installation, adapters, MCP and privacy.
+- [Carry preferences between agents](https://emulo.vercel.app/agent-profile#switch-agents): reuse a reviewed profile from Claude Code in a Codex project's AGENTS.md; conversation history and hidden state are not transferred.
+- [Verify profile loading](https://emulo.vercel.app/agent-profile#check-loading): a temporary marker check in a fresh conversation distinguishes installation from observed loading. One passing check is not a task-quality benchmark.
 - [Profile flow](https://github.com/ohad6k/emulo/blob/main/docs/PROFILE-FLOW.md): what each command reads and writes, which step sends text to a model, output files and caches, install targets and manual removal.
 - [Repository and installation](https://github.com/ohad6k/emulo): current documentation, native plugin instructions and source.
 - [Support matrix](https://github.com/ohad6k/emulo#support-matrix): source and destination status.
