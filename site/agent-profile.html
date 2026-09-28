@@ -98,12 +98,6 @@ Again: pnpm, never npm. It keeps creating package-lock.json.</code></pre>
   - Implication: give `pnpm install` and `pnpm test`, and do not create `package-lock.json`.
   - Quote (2026-09-01): "Use pnpm in this repo, not npm."
   - Quote (2026-09-03): "Again: pnpm, never npm."</code></pre>
-      <h2 id="review">Inspect, edit, remove</h2>
-      <ol>
-        <li><strong>Inspect.</strong> Read every rule next to its quote. <code>emulo verify you.md</code> checks whether quoted evidence can be found in the mined sessions; it cannot decide whether a rule is useful or accurately describes you. <a href="https://github.com/ohad6k/emulo/blob/main/docs/PROFILE-FLOW.md#check-the-receipts">What verify checks</a>.</li>
-        <li><strong>Edit.</strong> <code>you.md</code> is plain Markdown. Delete or rewrite any rule that is wrong, then install it again; the installer asks for <code>--yes</code> before replacing an earlier copy. A profile activated by the agent mining flow is hash-checked, so mine again instead of editing it in place. <a href="https://github.com/ohad6k/emulo/blob/main/docs/PROFILE-FLOW.md#read-and-edit-it">Editing details</a>.</li>
-        <li><strong>Remove.</strong> There is no uninstall command. Delete what <code>--install</code> wrote: the lines from <code>&lt;!-- emulo profile:start --&gt;</code> through <code>&lt;!-- emulo profile:end --&gt;</code> in <code>AGENTS.md</code>, or the folder <code>~/.claude/skills/you/</code>. <a href="https://github.com/ohad6k/emulo/blob/main/docs/PROFILE-FLOW.md#7-turn-it-off-or-remove-it">Every target</a>.</li>
-      </ol>
       <h2>Load the profile</h2>
       <p>For Codex or OpenCode, run this from the project after replacing <code>you.md</code> with your generated profile's path. It adds the profile to the project's <code>AGENTS.md</code>, the route the host test saw reach the model. It writes the whole profile, including verbatim quotes from your sessions, into that folder's <code>AGENTS.md</code>, which is usually committed and shared, so keep that file out of version control or install to a personal folder that is not committed.</p>
       <pre><code>emulo --install you.md --target agents --repo .</code></pre>
@@ -117,6 +111,12 @@ Again: pnpm, never npm. It keeps creating package-lock.json.</code></pre>
       <p>The MCP server serves the profile activated by the agent mining flow (<code>run emulo</code> or <code>emulo:mine</code>), which lives under <code>~/.emulo</code> or <code>EMULO_HOME</code>. A <code>you.md</code> from the <code>RUN_ME.md</code> path, installed with <code>emulo --install</code> as above, is not activated there, so the server does not see it. See <a href="https://github.com/ohad6k/emulo#mcp-server">MCP setup</a> for alternatives.</p>
     </section>
     <section id="switch-agents">
+      <h2 id="review">Inspect, edit, remove</h2>
+      <ol>
+        <li><strong>Inspect.</strong> Read every rule next to its quote. <code>emulo verify you.md</code> checks whether quoted evidence can be found in the mined sessions; it cannot decide whether a rule is useful or accurately describes you. <a href="https://github.com/ohad6k/emulo/blob/main/docs/PROFILE-FLOW.md#check-the-receipts">What verify checks</a>.</li>
+        <li><strong>Edit.</strong> <code>you.md</code> is plain Markdown. Delete or rewrite any rule that is wrong, then install it again; the installer asks for <code>--yes</code> before replacing an earlier copy. A profile activated by the agent mining flow is hash-checked, so mine again instead of editing it in place. <a href="https://github.com/ohad6k/emulo/blob/main/docs/PROFILE-FLOW.md#read-and-edit-it">Editing details</a>.</li>
+        <li><strong>Remove.</strong> There is no uninstall command. Delete what <code>--install</code> wrote: the lines from <code>&lt;!-- emulo profile:start --&gt;</code> through <code>&lt;!-- emulo profile:end --&gt;</code> in <code>AGENTS.md</code>, or the folder <code>~/.claude/skills/you/</code>. <a href="https://github.com/ohad6k/emulo/blob/main/docs/PROFILE-FLOW.md#7-turn-it-off-or-remove-it">Every target</a>.</li>
+      </ol>
       <h2>How do I carry my preferences from Claude Code to Codex?</h2>
       <p>Once you have reviewed a generated <code>you.md</code>, you can install that same file for another supported agent. You do not need to mine the same sessions again just to change the destination. This carries the profile's written preferences; it does not transfer an agent's full conversation, hidden state, or project files.</p>
       <p>From the project where you want Codex to use the profile, run the supported project-instructions install. Replace <code>you.md</code> with the path to your reviewed profile:</p>
@@ -144,7 +144,7 @@ Without the profile:  Unknown</code></pre>
       <h2 id="one-task">One real task, with and without the profile</h2>
       <p>This task ran once on 2026-09-28 in Codex CLI 0.157.0 with a read-only sandbox. Two identical temporary folders held a <code>package.json</code> with vitest, one source file, one test and no lockfile. One folder also had the hand-written pnpm rule from <a href="#example">the example</a>, installed with the <code>--target agents</code> command shown above. The other had no profile. Both got this prompt:</p>
       <pre><code>Add a script to run the tests and tell me the install command.</code></pre>
-      <p>Neither could save the change, because the sandbox was read-only. The replies, trimmed to the relevant lines:</p>
+      <p>Both runs used the same Codex setup, including skills the tester already had installed globally, so the only difference between them was the AGENTS.md file. Neither could save the change, because the sandbox was read-only. The replies, trimmed to the relevant lines:</p>
       <pre><code>With the profile:
 The workspace is read-only, so I couldn’t save the change. Add this field to `package.json`:
 "scripts": {
