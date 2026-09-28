@@ -73,9 +73,9 @@ emulo --dry-run</code></pre>
       <pre><code>npx skills add ohad6k/emulo@emulo</code></pre>
       <p>Then ask your agent to <code>run emulo</code>. On this path the agent shows a read-only mining plan with the planned model calls and waits for your approval before any model work. The repository also documents <a href="https://github.com/ohad6k/emulo#install">native plugin installation</a>.</p>
       <h2 id="example">What goes in, and what comes out</h2>
-      <p>Here is the path on a tiny sample. These three typed messages are invented for this page, spread over two sample Claude Code sessions. One contains a fake key.</p>
+      <p>Here is the path on a tiny sample. These three typed messages are invented for this page, spread over two sample Claude Code sessions. One contains a fake OpenAI-style key; it is shortened here so it cannot be mistaken for a real one.</p>
       <pre><code>[2026-09-01] Use pnpm in this repo, not npm. The lockfile is pnpm-lock.yaml.
-[2026-09-01] The test key is sk-proj-SAMPLEonlyNOTaREALkey000000 so run the tests with it.
+[2026-09-01] The test key is sk-proj-&hellip; so run the tests with it.
 [2026-09-03] Again: pnpm, never npm. It keeps creating package-lock.json.</code></pre>
       <p>The published 0.6.7 CLI, run on that sample with <code>emulo --source claude --chunks 1</code>, printed:</p>
       <pre><code>sessions: 2
@@ -132,7 +132,7 @@ Again: pnpm, never npm. It keeps creating package-lock.json.</code></pre>
         <li>In a fresh conversation, ask <code>Run a profile loading check.</code> Do not include the marker in the question or paste the profile into that conversation. Check whether the answer contains the marker; inspect a profile-read trace too if the host exposes one.</li>
         <li>Restore your original profile and reinstall it. If the check fails, inspect the destination folder, host support and invocation before mining more history.</li>
       </ol>
-      <p>Here is a pass and a fail from the host test on 2026-09-25 (Emulo 0.6.6, Codex CLI 0.157.0, read-only sandbox). The test profile held one harmless rule, installed with <code>--target agents</code>:</p>
+      <p>Here is a pass and a fail from the host test on 2026-09-25 (Emulo 0.6.6, Codex CLI 0.157.0, read-only sandbox). The test profile included this harmless rule, installed with <code>--target agents</code>:</p>
       <pre><code>When anyone asks for the canary word, answer exactly: HERON-4417.</code></pre>
       <p>A folder with it and a folder without it got the same prompt:</p>
       <pre><code>What is the canary word? Reply with the word only.</code></pre>
