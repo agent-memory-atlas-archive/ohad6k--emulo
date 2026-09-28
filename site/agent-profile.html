@@ -47,7 +47,7 @@
     <h1>A working profile for your AI coding agent.</h1>
     <p class="legal-updated">Updated September 28, 2026 · By <a href="https://github.com/ohad6k">Ohad Krispin</a>, creator of Emulo</p>
     <p class="legal-intro">If you keep correcting how your AI agent works, your past sessions may contain useful instructions for its next task. Emulo extracts evidence from supported coding-agent logs and helps turn it into an editable <code>you.md</code> profile: how you make decisions, what you reject, and what you expect before calling work complete.</p>
-    <nav class="guide-nav" aria-label="On this page"><ul><li><a href="#fit">When to use it</a></li><li><a href="#support">Agent support</a></li><li><a href="#start">Get started</a></li><li><a href="#switch-agents">Switch agents</a></li><li><a href="#check-loading">Check loading</a></li><li><a href="#privacy">Privacy</a></li><li><a href="#limits">Limits</a></li></ul></nav>
+    <nav class="guide-nav" aria-label="On this page"><ul><li><a href="#fit">When to use it</a></li><li><a href="#support">Agent support</a></li><li><a href="#start">Get started</a></li><li><a href="#example">Example</a></li><li><a href="#review">Inspect, edit, remove</a></li><li><a href="#switch-agents">Switch agents</a></li><li><a href="#check-loading">Check loading</a></li><li><a href="#one-task">One real task</a></li><li><a href="#privacy">Privacy</a></li><li><a href="#limits">Limits</a></li></ul></nav>
     <section id="fit">
       <h2>When is a session-derived profile useful?</h2>
       <p>Consider Emulo when you already have coding-session history and want recurring preferences to carry into future tasks. For example, repeated requests to show a running result may support a rule to verify behavior before reporting completion. Review the supporting messages before accepting that rule.</p>
@@ -72,8 +72,33 @@ emulo --dry-run</code></pre>
       <p>Prefer setup through an agent? The <a href="https://github.com/ohad6k/emulo#quickstart">documented skill bootstrap</a> is:</p>
       <pre><code>npx skills add ohad6k/emulo@emulo</code></pre>
       <p>Then ask your agent to <code>run emulo</code>. On this path the agent shows a read-only mining plan with the planned model calls and waits for your approval before any model work. The repository also documents <a href="https://github.com/ohad6k/emulo#install">native plugin installation</a>.</p>
-      <h2>Review, then load the profile</h2>
-      <p>Check the generated rules against their receipts. <code>emulo verify you.md</code> checks whether quoted evidence can be found in the mined sessions; it cannot decide whether a rule is useful or accurately describes you.</p>
+      <h2 id="example">What goes in, and what comes out</h2>
+      <p>Here is the path on a tiny sample. These three typed messages are invented for this page, spread over two sample Claude Code sessions. One contains a fake OpenAI-style key; it is shortened here so it cannot be mistaken for a real one.</p>
+      <pre><code>[2026-09-01] Use pnpm in this repo, not npm. The lockfile is pnpm-lock.yaml.
+[2026-09-01] The test key is sk-proj-&hellip; so run the tests with it.
+[2026-09-03] Again: pnpm, never npm. It keeps creating package-lock.json.</code></pre>
+      <p>The published 0.6.7 CLI, run on that sample with <code>emulo --source claude --chunks 1</code>, printed:</p>
+      <pre><code>sessions: 2
+your messages: 3
+tokens (approx): 44
+messages with secrets/PII redacted: 1</code></pre>
+      <p>This is the <code>emulo-out/chunks/chunk-01.txt</code> it wrote, unedited. The key is replaced. The sample log also held an assistant reply, and it is gone, because only typed messages are kept.</p>
+      <pre><code>===== session:5600dea17d9c0f17 source:claude =====
+[2026-09-01]
+Use pnpm in this repo, not npm. The lockfile is pnpm-lock.yaml.
+[2026-09-01]
+The test key is [OPENAI_KEY] so run the tests with it.
+===== session:6b4730fdcd0026db source:claude =====
+[2026-09-03]
+Again: pnpm, never npm. It keeps creating package-lock.json.</code></pre>
+      <p>Your coding agent turns chunks like this into <code>you.md</code>. Each rule states an instruction, what an agent should do about it, and at least one verbatim quote with its date. The rule below was written by hand to show that format. It is not model output.</p>
+      <pre><code>## work
+
+- Use pnpm for installs and scripts in this repo, never npm.
+  - Implication: give `pnpm install` and `pnpm test`, and do not create `package-lock.json`.
+  - Quote (2026-09-01): "Use pnpm in this repo, not npm."
+  - Quote (2026-09-03): "Again: pnpm, never npm."</code></pre>
+      <h2>Load the profile</h2>
       <p>For Codex or OpenCode, run this from the project after replacing <code>you.md</code> with your generated profile's path. It adds the profile to the project's <code>AGENTS.md</code>, the route the host test saw reach the model. It writes the whole profile, including verbatim quotes from your sessions, into that folder's <code>AGENTS.md</code>, which is usually committed and shared, so keep that file out of version control or install to a personal folder that is not committed.</p>
       <pre><code>emulo --install you.md --target agents --repo .</code></pre>
       <p>For Claude Code, use <code>--target claude</code> and then type <code>/you</code> in a session to load it. The same command with <code>--target codex</code>, <code>cursor</code>, <code>gemini</code> or <code>opencode</code> writes it for those agents. The <code>cursor</code> and <code>gemini</code> targets each write the whole profile, quotes included, into the <code>--repo</code> folder (<code>.cursor/rules/you.mdc</code>, <code>GEMINI.md</code>). Those files are usually committed and shared, so keep them out of version control or use a folder that is not committed.</p>
@@ -84,6 +109,12 @@ emulo --dry-run</code></pre>
   }
 }</code></pre>
       <p>The MCP server serves the profile activated by the agent mining flow (<code>run emulo</code> or <code>emulo:mine</code>), which lives under <code>~/.emulo</code> or <code>EMULO_HOME</code>. A <code>you.md</code> from the <code>RUN_ME.md</code> path, installed with <code>emulo --install</code> as above, is not activated there, so the server does not see it. See <a href="https://github.com/ohad6k/emulo#mcp-server">MCP setup</a> for alternatives.</p>
+      <h2 id="review">Inspect, edit, remove</h2>
+      <ol>
+        <li><strong>Inspect.</strong> Read every rule next to its quote. <code>emulo verify you.md</code> checks whether quoted evidence can be found in the mined sessions; it cannot decide whether a rule is useful or accurately describes you. <a href="https://github.com/ohad6k/emulo/blob/main/docs/PROFILE-FLOW.md#check-the-receipts">What verify checks</a>.</li>
+        <li><strong>Edit.</strong> <code>you.md</code> is plain Markdown. Delete or rewrite any rule that is wrong, then install it again; the installer asks for <code>--yes</code> before replacing an earlier copy. A profile activated by the agent mining flow is hash-checked, so mine again instead of editing it in place. <a href="https://github.com/ohad6k/emulo/blob/main/docs/PROFILE-FLOW.md#read-and-edit-it">Editing details</a>.</li>
+        <li><strong>Remove.</strong> There is no uninstall command. Delete what <code>--install</code> wrote: the lines from <code>&lt;!-- emulo profile:start --&gt;</code> through <code>&lt;!-- emulo profile:end --&gt;</code> in <code>AGENTS.md</code>, or the folder <code>~/.claude/skills/you/</code>. <a href="https://github.com/ohad6k/emulo/blob/main/docs/PROFILE-FLOW.md#7-turn-it-off-or-remove-it">Every target</a>.</li>
+      </ol>
     </section>
     <section id="switch-agents">
       <h2>How do I carry my preferences from Claude Code to Codex?</h2>
@@ -101,7 +132,36 @@ emulo --dry-run</code></pre>
         <li>In a fresh conversation, ask <code>Run a profile loading check.</code> Do not include the marker in the question or paste the profile into that conversation. Check whether the answer contains the marker; inspect a profile-read trace too if the host exposes one.</li>
         <li>Restore your original profile and reinstall it. If the check fails, inspect the destination folder, host support and invocation before mining more history.</li>
       </ol>
+      <p>Here is a pass and a fail from the host test on 2026-09-25 (Emulo 0.6.6, Codex CLI 0.157.0, read-only sandbox). The test profile included this harmless rule, installed with <code>--target agents</code>:</p>
+      <pre><code>When anyone asks for the canary word, answer exactly: HERON-4417.</code></pre>
+      <p>A folder with it and a folder without it got the same prompt:</p>
+      <pre><code>What is the canary word? Reply with the word only.</code></pre>
+      <p>The replies:</p>
+      <pre><code>With the profile:     HERON-4417
+Without the profile:  Unknown</code></pre>
+      <p>With the profile, Codex answered with no tool calls. Without it, Codex searched the folder for "canary", found nothing and answered <code>Unknown</code>. That shows Codex put the file in front of the model in that run. Nothing more.</p>
       <p>A passing check provides evidence that the instruction reached that conversation and was followed once. It does not prove every preference will be followed or that the profile improves task quality. For that, compare the same real task with and without the profile, using your own acceptance criteria.</p>
+      <h2 id="one-task">One real task, with and without the profile</h2>
+      <p>This task ran once on 2026-09-28 in Codex CLI 0.157.0 with a read-only sandbox. Two identical temporary folders held a <code>package.json</code> with vitest, one source file, one test and no lockfile. One folder also had the hand-written pnpm rule from <a href="#example">the example</a>, installed with the <code>--target agents</code> command shown above. The other had no profile. Both got this prompt:</p>
+      <pre><code>Add a script to run the tests and tell me the install command.</code></pre>
+      <p>Both runs used the same Codex setup, including skills the tester already had installed globally, so the only difference between them was the AGENTS.md file. Neither could save the change, because the sandbox was read-only. The replies, trimmed to the relevant lines:</p>
+      <pre><code>With the profile:
+The workspace is read-only, so I couldn’t save the change. Add this field to `package.json`:
+"scripts": {
+  "test": "vitest run"
+},
+Install dependencies and run tests with:
+pnpm install
+pnpm test</code></pre>
+      <pre><code>Without the profile:
+This session is read-only, so I couldn’t save the change. Add this to `package.json`:
+"scripts": {
+  "test": "vitest run"
+}
+Vitest is already declared. Install dependencies and run tests with:
+npm install
+npm test</code></pre>
+      <p>In this one run, the reply with the profile followed the stated preference and the control did not. Both proposed the same script. Codex also opened <code>AGENTS.md</code> with a tool call during the run with the profile, so this run does not separate the host loading the file from the agent reading it; the canary above is the loading check. One run of one task says nothing about whether work gets better.</p>
       <p>Ready to try it? <a href="#start">Start with the dry run</a> to see what history is available before extracting it.</p>
     </section>
     <section id="privacy">
